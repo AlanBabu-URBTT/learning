@@ -47,8 +47,40 @@ rows = [
 
 insert_row_into_table(rows, receipts)
 
+table_name = "waiters"
+waiters = Table(
+    table_name,
+    metadata_obj,
+    Column("receipt_id", Integer, primary_key=True),
+    Column("waiter_name", String(16), primary_key=True),
+)
+metadata_obj.create_all(engine)
+
+rows = [
+    {"receipt_id": 1, "waiter_name": "Corey Johnson"},
+    {"receipt_id": 2, "waiter_name": "Michael Watts"},
+    {"receipt_id": 3, "waiter_name": "Michael Watts"},
+    {"receipt_id": 4, "waiter_name": "Margaret James"},
+]
+insert_row_into_table(rows, waiters)
 
 inspector = inspect(engine)
+
+'''
 columns_info = [(col["name"], col["type"]) for col in inspector.get_columns("receipts")]
 table_description = "Columns:\n" + "\n".join([f"- {name}: {type_}" for name, type_ in columns_info])
-print(table_description)
+print(table_description)'''
+
+updated_description = """Allows you to perform SQL queries on the table. Beware that this tool's output is a string representation of the execution output.
+It can use the following tables:"""
+
+inspector = inspect(engine)
+for table in ["receipts", "waiters"]:
+    columns_info = [(col["name"], col["type"]) for col in inspector.get_columns(table)]
+
+    table_description = f"Table '{table}':\n"
+
+    table_description += "Columns:\n" + "\n".join([f"  - {name}: {col_type}" for name, col_type in columns_info])
+    updated_description += "\n\n" + table_description
+
+print(updated_description)
